@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ngrok Dashboard</title>
+<style>
+  body { font-family: system-ui, sans-serif; margin: 0; background: #12141a; color: #e6e8ee; }
+  main { max-width: 960px; margin: 0 auto; padding: 24px 16px; }
+  h1 { font-size: 1.4rem; } h2 { font-size: 1.1rem; margin-top: 2rem; }
+  input, button { font: inherit; padding: 6px 10px; border-radius: 6px; border: 1px solid #3a3f4d; background: #1c1f28; color: inherit; }
+  button { cursor: pointer; } button:hover { background: #2a2f3d; }
+  table { width: 100%; border-collapse: collapse; } td, th { text-align: left; padding: 6px; border-bottom: 1px solid #2a2f3d; }
+  pre { background: #1c1f28; padding: 10px; border-radius: 6px; overflow-x: auto; white-space: pre-wrap; word-break: break-all; }
+  details { border: 1px solid #2a2f3d; border-radius: 6px; margin: 6px 0; padding: 6px 10px; }
+  .err { color: #ff8080; } .muted { color: #8b91a3; }
+</style>
+</head>
+<body>
+<main>
+  <h1>ngrok Dashboard</h1>
+  <form id="start">
+    <input id="port" type="number" min="1" max="65535" placeholder="Local port" required>
+    <button>Start tunnel</button> <span id="msg" class="err"></span>
+  </form>
+
+  <h2>Active tunnels</h2>
+  <table><thead><tr><th>Port</th><th>Public URL</th><th></th></tr></thead><tbody id="tunnels"></tbody></table>
+
+  <h2>Request inspector</h2>
+  <p class="muted">Send requests to <code>/hook/&lt;anything&gt;</code> on a tunnel that points at this dashboard's port.</p>
+  <button id="clear">Clear</button>
+  <div id="requests"></div>
+</main>
+<script>
+const $ = (id) => document.getElementById(id);
+const el = (tag, text) => { const n = document.createElement(tag); if (text !== undefined) n.textContent = text; return n; };
+
+async function loadTunnels() {
+  const tunnels = await (await fetch("/api/tunnels")).json();
+  const body = $("tunnels"); body.replaceChildren();
+  for (const t of tunnels) {
+    const tr = el("tr");
+    tr.append(el("td", t.port));
+    const td = el("td"); const a = el("a", t.url); a.href = t.url; a.target = "_blank"; a.rel = "noopener"; td.append(a); tr.append(td);
+    const act = el("td"); const b = el("button", "Stop");
+    b.onclick = async () => { await fetch("/api/tunnels/" + t.id, { method: "DELETE" }); loadTunnels(); };
+    act.append(b); tr.append(act); body.append(tr);
+  }
+}
+
+async function loadRequests() {
+  const items = await (await fetch("/api/requests")).json();
+  const box = $("requests");
+  const open = new Set([...box.querySelectorAll("details[open]")].map((d) => d.dataset.id));
+  box.replaceChildren();
+  for (const r of items) {
+    const d = el("details"); d.dataset.id = r.id; d.open = open.has(String(r.id));
+    d.append(el("summary", `${r.time}  ${r.method} ${r.path}${r.query ? "?" + r.query : ""}`));
+    d.append(el("pre", JSON.stringify(r.headers, null, 2)));
+    d.append(el("pre", r.body || "(empty body)"));
+    box.append(d);
+  }
+}
+
+$("start").onsubmit = async (e) => {
+  e.preventDefault(); $("msg").textContent = "";
+  const res = await fetch("/api/tunnels", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ port: Number($("port").value) }) });
+  if (!res.ok) $("msg").textContent = (await res.json()).error;
+  loadTunnels();
+};
+$("clear").onclick = async () => { await fetch("/api/requests", { method: "DELETE" }); loadRequests(); };
+
+loadTunnels(); loadRequests(); setInterval(loadRequests, 2000);
+</script>
+</body>
+</html>
