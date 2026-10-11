@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ngrok Web Tool</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <header>
+    <h1>ngrok Web Tool</h1>
+    <span id="agent-status" class="badge">checking…</span>
+  </header>
+
+  <main>
+    <section>
+      <h2>Start a tunnel</h2>
+      <form id="tunnel-form">
+        <label>Name <input name="name" required pattern="[A-Za-z0-9][A-Za-z0-9_.\-]{0,63}" placeholder="my-app"></label>
+        <label>Protocol
+          <select name="proto">
+            <option>http</option><option>tcp</option><option>tls</option>
+          </select>
+        </label>
+        <label>Address <input name="addr" required placeholder="8080 or localhost:8080"></label>
+        <button type="submit">Start</button>
+      </form>
+      <p id="form-error" class="error" role="alert"></p>
+    </section>
+
+    <section>
+      <h2>Active tunnels</h2>
+      <table id="tunnels">
+        <thead><tr><th>Name</th><th>Public URL</th><th>Forwards to</th><th>Requests</th><th></th></tr></thead>
+        <tbody></tbody>
+      </table>
+      <p id="tunnels-empty" class="muted" hidden>No active tunnels.</p>
+    </section>
+
+    <section>
+      <div class="row">
+        <h2>Recent requests</h2>
+        <button id="clear-requests" class="secondary">Clear</button>
+      </div>
+      <table id="requests">
+        <thead><tr><th>Time</th><th>Method</th><th>URI</th><th>Status</th><th>ms</th><th></th></tr></thead>
+        <tbody></tbody>
+      </table>
+      <p id="requests-empty" class="muted" hidden>No requests captured yet.</p>
+      <pre id="request-detail" hidden></pre>
+    </section>
+  </main>
+  <script src="/app.js"></script>
+</body>
+</html>

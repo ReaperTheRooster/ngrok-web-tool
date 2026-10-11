@@ -1,0 +1,35 @@
+:root {
+  --bg: #0f1419; --panel: #1a2029; --text: #e6e9ee; --muted: #8b95a5;
+  --accent: #4f9cf9; --ok: #3fb950; --bad: #f85149; --border: #2b3441;
+}
+@media (prefers-color-scheme: light) {
+  :root { --bg: #f5f7fa; --panel: #fff; --text: #1b2430; --muted: #5d6877; --border: #d8dee6; }
+}
+* { box-sizing: border-box; }
+body { margin: 0; font: 15px/1.5 system-ui, sans-serif; background: var(--bg); color: var(--text); }
+header { display: flex; align-items: center; gap: 12px; padding: 16px 24px; border-bottom: 1px solid var(--border); }
+h1 { font-size: 20px; margin: 0; }
+h2 { font-size: 16px; margin: 0 0 12px; }
+main { max-width: 1000px; margin: 0 auto; padding: 16px; display: grid; gap: 16px; }
+section { background: var(--panel); border: 1px solid var(--border); border-radius: 8px; padding: 16px; overflow-x: auto; }
+.row { display: flex; justify-content: space-between; align-items: center; }
+.badge { font-size: 12px; padding: 2px 10px; border-radius: 999px; background: var(--border); color: var(--muted); }
+.badge.online { background: var(--ok); color: #fff; }
+.badge.offline { background: var(--bad); color: #fff; }
+form { display: flex; flex-wrap: wrap; gap: 12px; align-items: end; }
+label { display: grid; gap: 4px; font-size: 13px; color: var(--muted); }
+input, select { padding: 6px 8px; border: 1px solid var(--border); border-radius: 6px; background: var(--bg); color: var(--text); font: inherit; }
+button { padding: 7px 14px; border: 0; border-radius: 6px; background: var(--accent); color: #fff; font: inherit; cursor: pointer; }
+button.secondary { background: transparent; color: var(--muted); border: 1px solid var(--border); }
+button.danger { background: var(--bad); }
+button:disabled { opacity: .5; cursor: default; }
+table { width: 100%; border-collapse: collapse; }
+th, td { text-align: left; padding: 6px 8px; border-bottom: 1px solid var(--border); font-size: 14px; }
+th { color: var(--muted); font-weight: 500; }
+td.mono, pre { font-family: ui-monospace, monospace; font-size: 13px; }
+td.actions { white-space: nowrap; text-align: right; }
+a { color: var(--accent); }
+.muted { color: var(--muted); }
+.error { color: var(--bad); min-height: 1.4em; margin: 8px 0 0; }
+.s2 { color: var(--ok); } .s4, .s5 { color: var(--bad); }
+pre { background: var(--bg); padding: 12px; border-radius: 6px; overflow: auto; max-height: 360px; }
